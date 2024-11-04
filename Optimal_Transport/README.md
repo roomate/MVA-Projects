@@ -4,7 +4,7 @@ This repository proposes an implementation from scratch of the work realised in 
 It mainly studies different relaxations of the Kantorovich problem in finite dimension, which I may recall is already in itself the 
 relaxation of Monge problem. 
 
-The application considered here is colour transfer, a image processing technique to 'transfer' the colour of a picture to another!
+The application considered here is colour transfer, an image processing technique to 'transfer' the colour of a picture to another!
 
 Given a source and a reference image:
 
