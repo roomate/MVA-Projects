@@ -1,4 +1,4 @@
-This repository contains the project for the Course **Robotics** of Aymeric Caron at MVA, done in collaboration with Charles-André Kieffer. 
+This repository contains the project for the Course **Robotics** of Stéphane Caron at MVA, done in collaboration with Charles-André Kieffer. 
 It deals with the making of a control law for a walking biped robot, a very common problem in robotics engineering, and not as difficult as it could appear first.
 It is based on the papers: 
 [Trajectory Free Linear Model Predictive Control for Stable Walking in the Presence of Strong Perturbations](https://ieeexplore.ieee.org/abstract/document/4115592), 
