@@ -8,7 +8,7 @@ The application considered here is colour transfer, a image processing technique
 
 Given a source and a reference image:
 
-<img src="img/arbre.jpg" alt="drawing" width="200"/> <img src="img/drapeau.jpg" alt="drawing" width="200"/> 
+<img src="img/arbre.jpg" alt="drawing" width="220"/> <img src="img/drapeau.jpg" alt="drawing" width="200"/> 
 
 we can transport the colour of the first to the second!
 
