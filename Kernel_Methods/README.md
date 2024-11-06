@@ -8,3 +8,5 @@ Each image is associated with a label from 0 to 9 such that the total number of 
 ![Capture d’écran 2024-04-11 à 16 39 20](https://github.com/L-Tocquec/Kernel-Methods-for-ML-Kaggle-challenge/assets/147623211/bb4ea0ea-c7eb-45aa-aff3-5204f2a57b4b)
 
 This project is the perfect occasion to implement and test classical kernel methods on actual data.
+
+Done in collaboration with Louis Tocquec.
