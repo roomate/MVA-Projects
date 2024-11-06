@@ -10,6 +10,6 @@ Given a source and a reference image:
 
 <img src="img/arbre.jpg" alt="drawing" width="220"/> <img src="img/drapeau.jpg" alt="drawing" width="200"/> 
 
-we can transport the colour of the first to the second!
+we can transport the colours of the first to the second!
 
 <img src="img/cluster_n 10_m=50.PNG" alt="drawing" width="200"/> 
