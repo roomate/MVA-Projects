@@ -6,6 +6,8 @@ relaxation of Monge problem.
 
 The application considered here is colour transfer, an image processing technique to 'transfer' the colour of a picture to another!
 
+##Example 
+
 Given a source and a reference image:
 
 <img src="img/arbre.jpg" alt="drawing" width="220"/> <img src="img/drapeau.jpg" alt="drawing" width="200"/> 
