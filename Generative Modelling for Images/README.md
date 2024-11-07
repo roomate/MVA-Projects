@@ -1,1 +1,1 @@
-# Generative modelling for Images
+# Generative Modelling for Images
