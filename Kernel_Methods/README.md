@@ -20,7 +20,7 @@ As usual, there is a training phase followed by a testing phase.
 The training phase concerns the encoder and the decoder. For the encoder, it amounts to find the principal components of the test dataset. It costs the computation of eigenvalues.
 For the decoder, it consists in finding the optimal coefficients of the MKRR. Numerically speaking, it amounts to inverse the Ridge matrix.
 
-The noisy data is simply made by adding a uniform noise pixel-wise to some clean MNIST.
+The test dataset is simply made by adding a uniform pixel-wise noise to some clean MNIST.
 
 Below is the result after training for different levels of noise.
 
