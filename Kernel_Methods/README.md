@@ -1,6 +1,6 @@
 # Kernel Methods
 
-Kernel Methods are a class of algorithm to tackle non-linear problems. The idea is to map the data from the feature space, to a special kind of Hilbert Space, a Reproducing Kernel Hilbert Space, by the means of a positive-definite kernel. This famework has the extraordinary
+Kernel Methods are a class of algorithms to tackle unsupervised and supervised learning in nonlinear problems. The idea is to map the data from the feature space, to a special kind of Hilbert Space, a Reproducing Kernel Hilbert Space, by the means of a positive-definite kernel. This famework has the extraordinary
 property to leverage any algorithm based on a linear model (Linear Ridge Regression, SVM, PCA...) to its non-linear counterpart.
 
 The notebook above displays some simple academic examples to illustrate what can be done when the data does not possess any linear feature.
@@ -18,7 +18,7 @@ MKRR plays the role of the decoder. It maps the principal components to the whol
 As usual, there is a training phase followed by a testing phase. 
 
 The training phase concerns the encoder and the decoder. For the encoder, it amounts to find the principal components of the test dataset. It costs the computation of eigenvalues.
-For the decoder, it consists in finding the optimal coefficients of the MKRR. Numerically speaking, it amounts to inverse the Ridge matrix.
+For the decoder, it consists in computing the optimal coefficients of the kernel decomposition. Numerically speaking, the majority of the cost comes from the inversion of the Ridge matrix.
 
 The test dataset is simply made by adding a uniform pixel-wise noise to some clean MNIST.
 
@@ -43,3 +43,6 @@ Below is the result after training for different levels of noise.
 - 100%:
 <img src="img/noise_1.PNG" alt="drawing" width="300"/> 
 <img src="img/denoise_1.PNG" alt="drawing" width="300"/> 
+
+From what I could experiment, when the level of noise is low, a small regularization parameter and decoder's variance is better.
+On the opposite, a large regularization parameter and decoder's variance is better when there is a large amount of noise in the data.
