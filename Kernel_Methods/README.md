@@ -25,21 +25,21 @@ The noisy data is simply made by adding a uniform noise pixel-wise to some clean
 Below is the result after training for different levels of noise.
 
 - 0%:
-<img src="img/noise_0.PNG" alt="drawing" width="200"/> 
-<img src="img/denoise_0.PNG" alt="drawing" width="200"/> 
+<img src="img/noise_0.PNG" alt="drawing" width="300"/> 
+<img src="img/denoise_0.PNG" alt="drawing" width="300"/> 
 
 - 20%:
-<img src="img/noise_0.2.PNG" alt="drawing" width="200"/> 
-<img src="img/denoise_0.2.PNG" alt="drawing" width="200"/> 
+<img src="img/noise_0.2.PNG" alt="drawing" width="300"/> 
+<img src="img/denoise_0.2.PNG" alt="drawing" width="300"/> 
 
 - 50%:
-<img src="img/noise_0.5.PNG" alt="drawing" width="200"/> 
-<img src="img/denoise_0.5.PNG" alt="drawing" width="200"/> 
+<img src="img/noise_0.5.PNG" alt="drawing" width="300"/> 
+<img src="img/denoise_0.5.PNG" alt="drawing" width="300"/> 
 
 - 70%:
-<img src="img/noise_0.7.PNG" alt="drawing" width="200"/> 
-<img src="img/denoise_0.7.PNG" alt="drawing" width="200"/> 
+<img src="img/noise_0.7.PNG" alt="drawing" width="300"/> 
+<img src="img/denoise_0.7.PNG" alt="drawing" width="300"/> 
 
 - 100%:
-<img src="img/noise_1.PNG" alt="drawing" width="200"/> 
-<img src="img/denoise_1.PNG" alt="drawing" width="200"/> 
+<img src="img/noise_1.PNG" alt="drawing" width="300"/> 
+<img src="img/denoise_1.PNG" alt="drawing" width="300"/> 
