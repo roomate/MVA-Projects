@@ -2,6 +2,9 @@
 #########  Fisher Kernel's discriminant  ##########
 ###################################################
 
+import numpy as np
+import scipy.linalg
+
 class Fisher_discriminant:
     def __init__(self, kernel, nb_class = 10):
         self.kernel = kernel
@@ -39,7 +42,7 @@ class Fisher_discriminant:
         The list has the following structure, for each class, we store the elements in this class and with the order in which it appears.
         This list will be usefull to compute the matrix N.
         """
-        order = np.zeros((self.n_class,len(data_x)))
+        order = np.zeros((self.n_class, len(data_x)))
         counter = np.zeros(self.n_class)
         for i in range(len(data_x)):
             order[data_y[i] - 1][i] = counter[data_y[i] - 1]
@@ -87,20 +90,19 @@ class Fisher_discriminant:
             N_matrix += Kj.dot(np.eye(l) - np.ones((l,l))*1/l).dot(Kj.T)
         return N_matrix
 
-    def fit(self, data_x, data_y):
+    def fit(self, data_x, data_y, nb_eig_v):
         if (len(data_x) != len(data_y)):
-            print("error, label and data have not same length")
-            return 0
+            raise ValueError("error, label and data have not same length")
         self.N = data_x.shape[0]
         self.gram = self._Gram(data_x, data_x)
         self._count_class(data_y)
-        M_matri, N_matrix = self.M_matrix(data_x, data_y)
+        M_matri, N_matrix = self.M_matrix(data_x, data_y), self.N_matrix(data_x, data_y)
         vecs = scipy.linalg.eig(M_matri, N_matrix)
-        return vecs[1][:,:self.n_class - 1]
+        return vecs[1][:,:nb_eig_v]
 
     def transform(self, eig_vec, data_x_tr, data_x_te):
         """
-        Compute the projection of data_x onto eigenvectors.
+        Compute the projection of data_x_te onto the eigenvectors of data_x_tr
         """
         gram = self._Gram(data_x_tr,data_x_te)
-        return np.dot(eig_vec,gram), gram
+        return np.dot(eig_vec.T,gram), gram

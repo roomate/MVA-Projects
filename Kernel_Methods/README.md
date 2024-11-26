@@ -1,12 +1,45 @@
-# Kernel-Methods-for-ML-Kaggle-challenge
-This challenge, carried out as part of the "kernel methods for machine learning" course of the Msc MVA, involves the implementation of an image classification model based solely on kernel methods. 
+# Kernel Methods
 
-### Decription of the dataset
-The dataset is composed of 5000 images of 32x32 pixels represented as a vector of size 3072 such that the first 1024 values represent pixel intensities on the red channel, the next 1024 columns represent the green channel and the last 1024 columns the blue channel.
-Each image is associated with a label from 0 to 9 such that the total number of classes is 10.
-### An example of an image 
-![Capture d’écran 2024-04-11 à 16 39 20](https://github.com/L-Tocquec/Kernel-Methods-for-ML-Kaggle-challenge/assets/147623211/bb4ea0ea-c7eb-45aa-aff3-5204f2a57b4b)
+Kernel Methods are a class of algorithm to tackle non-linear problems. The idea is to map the data from the feature space, to a special kind of Hilbert Space, a Reproducing Kernel Hilbert Space, by the means of a positive-definite kernel. This famework has the extraordinary
+property to leverage any algorithm based on a linear model (Linear Ridge Regression, SVM, PCA...) to its non-linear counterpart.
 
-This project is the perfect occasion to implement and test classical kernel methods on actual data.
+The notebook above displays some simple academic examples to illustrate what can be done when the data does not possess any linear feature.
 
-Done in collaboration with Louis Tocquec.
+A smart combination of these methods can even lead to a simple denoiser, see below.
+
+## Denoising
+
+We can build a small autoencoder with Kernel PCA and Multivariate Kernel Ridge Regression (MKRR).
+
+Kernel PCA plays the role of the encoder: it outputs the principal components of the Gram matrix.
+
+MKRR plays the role of the decoder. It maps the principal components to the whole data matrix, the MNIST itself. 
+
+As usual, there is a training phase followed by a testing phase. 
+
+The training phase concerns the encoder and the decoder. For the encoder, it amounts to find the principal components of the test dataset. It costs the computation of eigenvalues.
+For the decoder, it consists in finding the optimal coefficients of the MKRR. Numerically speaking, it amounts to inverse the Ridge matrix.
+
+The noisy data is simply made by adding a uniform noise pixel-wise to some clean MNIST.
+
+Below is the result after training for different levels of noise.
+
+- 0%:
+<img src="img/noise_0.PNG" alt="drawing" width="200"/> 
+<img src="img/denoise_0.PNG" alt="drawing" width="200"/> 
+
+- 20%:
+<img src="img/noise_0.2.PNG" alt="drawing" width="200"/> 
+<img src="img/denoise_0.2.PNG" alt="drawing" width="200"/> 
+
+- 50%:
+<img src="img/noise_0.5.PNG" alt="drawing" width="200"/> 
+<img src="img/denoise_0.5.PNG" alt="drawing" width="200"/> 
+
+- 70%:
+<img src="img/noise_0.7.PNG" alt="drawing" width="200"/> 
+<img src="img/denoise_0.7.PNG" alt="drawing" width="200"/> 
+
+- 100%:
+<img src="img/noise_1.PNG" alt="drawing" width="200"/> 
+<img src="img/denoise_1.PNG" alt="drawing" width="200"/> 
