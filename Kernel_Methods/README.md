@@ -18,7 +18,7 @@ For the training stage:
 It computes the Gram matrix of a MNIST, and find the eigenvectors associated to the largest eigenvalues (also called the principal components).
 
 For the test stage:
-It computes the projection of the MNIST along the principal components. The raw quantity of information is drastically reduced, this is the so-called latent space.
+It calculates the projection of the MNIST onto the principal components. The raw quantity of information is drastically reduced, this is the so-called latent space.
 
 ### Decoder
 MKRR plays the role of the decoder.
