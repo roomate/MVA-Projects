@@ -9,16 +9,34 @@ A smart combination of these methods can even lead to a simple denoiser, see bel
 
 ## Denoising
 
-We can build a small autoencoder with Kernel PCA and Multivariate Kernel Ridge Regression (MKRR).
+We can build a small autoencoder for denoising with simply Kernel PCA and Multivariate Kernel Ridge Regression(MKRR) algorithms.
 
-Kernel PCA plays the role of the encoder: it outputs the principal components of the Gram matrix.
+### Encoder
+Kernel PCA plays the role of the encoder. 
 
-MKRR plays the role of the decoder. It maps the principal components to the whole data matrix, the MNIST itself. 
+For the training stage:
+It computes the Gram matrix of a MNIST, and find the eigenvectors associated to the largest eigenvalues (also called the principal components).
+
+For the test stage:
+It computes the projection of the MNIST along the principal components. The raw quantity of information is drastically reduced, this is the so-called latent space.
+
+### Decoder
+MKRR plays the role of the decoder.
+
+For the training phase:
+It calculates the optimal coefficients of the ridge regression.
+
+For the test phase:
+It reconstructs the whole MNIST by regression, knowing only its principal components.
+
+### Results
+To sum up, the denoiser works as follows. Put the noisy MNIST into the encoder to project it along the principal components. Then, the decoder maps those components to the whole data matrix. 
+
+The key idea is to discard the noisy features when projecting the MNIST along the principal components, while keeping the information related to the digit. So, the trick is to choose the right number of principal components,
+enough to store what digit is represented, but not too much to set off the noise.
+
 
 As usual, there is a training phase followed by a testing phase. 
-
-The training phase concerns the encoder and the decoder. For the encoder, it amounts to find the principal components of the test dataset. It costs the computation of eigenvalues.
-For the decoder, it consists in computing the optimal coefficients of the kernel decomposition. Numerically speaking, the majority of the cost comes from the inversion of the Ridge matrix.
 
 The test dataset is simply made by adding a uniform pixel-wise noise to some clean MNIST.
 
