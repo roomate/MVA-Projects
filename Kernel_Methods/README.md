@@ -33,7 +33,7 @@ It reconstructs the whole MNIST by regression, knowing only its principal compon
 To sum up, the denoiser works as follows. Put the noisy MNIST into the encoder to project it along the principal components. Then, the decoder maps those components to the whole data matrix. 
 
 The key idea is to discard the noisy features when projecting the MNIST along the principal components, while keeping the information related to the digit. So, the trick is to choose the right number of principal components.
-If this number is too high, the noise remains present in the MNIST, whereas if it is too low, the information of the digit represented is lost.
+If this number is too high, the noise remains present in the MNIST, whereas if it is too low, the information of the digit is removed too.
 
 As usual, there is a training phase followed by a testing phase. 
 
