@@ -1,0 +1,1 @@
+Exercise labs for the Generative Modeling for Images Course at MVA.
