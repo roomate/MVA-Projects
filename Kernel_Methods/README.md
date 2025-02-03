@@ -62,7 +62,7 @@ Below is the result after training for different levels of noise.
 <img src="img/denoise_1.PNG" alt="drawing" width="400"/> 
 
 From what I could experiment, when the level of noise is low, a small regularization parameter and decoder's variance is better.
-On the opposite, a large regularization parameter and decoder's variance is better when there is a large amount of noise in the data.
+On the opposite, a large regularization parameter and decoder's variance is more suited when there is a large amount of noise in the data.
 
 There is certainly better parameters to set for the denoiser. Given my limited computing resources, 
 I do not have the time to try a large spectrum of value, but if you find some that gives pretty good results, 
