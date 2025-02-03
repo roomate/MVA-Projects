@@ -42,28 +42,28 @@ The test dataset is simply made by adding a uniform pixel-wise noise to some cle
 Below is the result after training for different levels of noise.
 
 - 0%:
-<img src="img/noise_0.PNG" alt="drawing" width="300"/> 
-<img src="img/denoise_0.PNG" alt="drawing" width="300"/> 
+<img src="img/noise_0.PNG" alt="drawing" width="400"/> 
+<img src="img/denoise_0.PNG" alt="drawing" width="400"/> 
 
 - 20%:
-<img src="img/noise_0.2.PNG" alt="drawing" width="300"/> 
-<img src="img/denoise_0.2.PNG" alt="drawing" width="300"/> 
+<img src="img/noise_0.2.PNG" alt="drawing" width="400"/> 
+<img src="img/denoise_0.2.PNG" alt="drawing" width="400"/> 
 
 - 50%:
-<img src="img/noise_0.5.PNG" alt="drawing" width="300"/> 
-<img src="img/denoise_0.5.PNG" alt="drawing" width="300"/> 
+<img src="img/noise_0.5.PNG" alt="drawing" width="400"/> 
+<img src="img/denoise_0.5.PNG" alt="drawing" width="400"/> 
 
 - 70%:
-<img src="img/noise_0.7.PNG" alt="drawing" width="300"/> 
-<img src="img/denoise_0.7.PNG" alt="drawing" width="300"/> 
+<img src="img/noise_0.7.PNG" alt="drawing" width="400"/> 
+<img src="img/denoise_0.7.PNG" alt="drawing" width="400"/> 
 
 - 100%:
-<img src="img/noise_1.PNG" alt="drawing" width="300"/> 
-<img src="img/denoise_1.PNG" alt="drawing" width="300"/> 
+<img src="img/noise_1.PNG" alt="drawing" width="400"/> 
+<img src="img/denoise_1.PNG" alt="drawing" width="400"/> 
 
 From what I could experiment, when the level of noise is low, a small regularization parameter and decoder's variance is better.
 On the opposite, a large regularization parameter and decoder's variance is better when there is a large amount of noise in the data.
 
 There is certainly better parameters to set for the denoiser. Given my limited computing resources, 
 I do not have the time to try a large spectrum of value, but if you find some that gives pretty good results, 
-I'd be very glad you let me know! 
+I'd be very glad you let me know ! 
