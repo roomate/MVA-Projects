@@ -32,7 +32,7 @@ It reconstructs the whole MNIST by regression, knowing only its principal compon
 ### Results
 To sum up, the denoiser works as follows. Put the noisy MNIST into the encoder to project it along the principal components. Then, the decoder maps those components to the whole data matrix. 
 
-The key idea is to discard the noisy features when projecting the MNIST along the principal components, while keeping the information related to the digit. So, the trick is to choose the right number of principal components.
+The key idea is to discard the noisy features when projecting the MNIST along the principal components, while keeping the information necessary to recognize a digit. So, the trick is to choose the right number of principal components.
 If this number is too high, the noise remains present in the MNIST, whereas if it is too low, the information of the digit is removed too.
 
 As usual, there is a training phase followed by a testing phase. 
@@ -60,9 +60,9 @@ Below is the result after training for different levels of noise.
 - 100%:
 <img src="img/noise_1.PNG" alt="drawing" width="400"/> 
 <img src="img/denoise_1.PNG" alt="drawing" width="400"/> 
-
+Once the method is set up, the whole method rely on hyperparameter's tuning.
 From what I could experiment, when the level of noise is low, a small regularization parameter and decoder's variance is better.
-On the opposite, a large regularization parameter and decoder's variance is more suited when there is a large amount of noise in the data.
+On the opposite, a large regularization parameter and decoder's variance is more suited when there is a large amount of noise in the data
 
 There is certainly better parameters to set for the denoiser. Given my limited computing resources, 
 I do not have the time to try a large spectrum of value, but if you find some that gives pretty good results, 
