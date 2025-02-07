@@ -3,22 +3,27 @@
 ###################################################
 #Hugo Negrel
 #April 2024
+#The mathematical details about KFDA can be be found at: 
 
 import numpy as np
 import scipy.linalg
 from sklearn.datasets import load_iris
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.base import TransformerMixin, ClassifierMixin, BaseEstimator
+from sklearn.neighbors import NearestCentroid
+from sklearn.utils.validation import check_is_fitted
+from scipy.linalg import eigh
 import logging
 from collections.abc import Callable
+from sklearn.preprocessing import normalize
+import matplotlib.pyplot as plt
 
-def split_dataset(data_x: np.array, data_y: np.array, split: int=15)->(np.array, np.array, np.array, np.array):
-    dataset=np.concatenate((data_x, data_y[:,None]), axis=1)
-    np.random.shuffle(dataset)
-    dataset_x, dataset_y=dataset[:,:-1], dataset[:,-1]
-    data_x_test, data_x_train=np.split(dataset_x, [split], axis=0)
-    data_y_test, data_y_train=np.split(dataset_y, [split], axis=0)
-    return data_x_train, data_y_train.astype(int), data_x_test, data_y_test.astype(int)
+def split_dataset(X: np.array, y: np.array, split: int=20)->(np.array, np.array, np.array, np.array):
+    X_test, X = np.split(X, [split], axis=0)
+    y_test, y = np.split(y, [split], axis=0)
+    return X, y.astype(int), X_test, y_test.astype(int)
 
-def generate_dataset(mu: np.array, sigma: np.array):
+def generate_dataset(mu: np.array, sigma: np.array, size: int=100):
     mu1=mu[0]
     mu2=mu[1]
     mu3=mu[2]
@@ -27,122 +32,163 @@ def generate_dataset(mu: np.array, sigma: np.array):
     sigma2=sigma[1]
     sigma3=sigma[2]
     
-    X=np.concatenate((np.random.multivariate_normal([-1,mu1],np.eye(2)*sigma1, size=100),np.random.multivariate_normal([3,mu2],np.eye(2)*sigma2, size=100), np.random.multivariate_normal([1,mu3],np.eye(2)*sigma3, size=100)), axis=0)
-    Y=np.array([0 for i in range(100)] + [1 for i in range(100)] + [2 for i in range(100)])
-    return X,Y
+    X=np.concatenate((np.random.multivariate_normal([4,mu1],np.eye(2)*sigma1, size=size),np.random.multivariate_normal([-2,mu2],np.eye(2)*sigma2, size=size), np.random.multivariate_normal([5,mu3],np.eye(2)*sigma3, size=size)), axis=0)
+    Y=np.array([0 for i in range(size)] + [1 for i in range(size)] + [2 for i in range(size)])
+    Z = np.concatenate((X, Y[:,None]), axis=1)
+    np.random.shuffle(Z)
+    return Z[:,:2], Z[:,2]
 
-def kernel(sigma: float):
-    def RBF_kernel(x: np.array,y: np.array):
-        return np.exp(-1/sigma*np.sum(x[:,None,:] - y[None,:,:], axis=-1)**2)
-    return RBF_kernel
+def symetrize(M: np.ndarray) -> None:
+    M[:,:] = (M + M.T)/2
 
-class Fisher_discriminant:
-    def __init__(self, kernel: Callable[[np.array, np.array],np.array], nb_class: int):
+def kernel(name: str, *args) -> Callable[[np.ndarray, np.ndarray], np.ndarray]:
+    if name is None:
+        name='RBF'
+    if name == 'RBF':
+        if len(args) == 0:
+            args=[1]
+        sigma = args[0]
+        def RBF_kernel(x: np.ndarray,y: np.ndarray):
+            return np.exp(-1/sigma*np.sum(x[:,None,:] - y[None,:,:], axis=-1)**2)
+        return RBF_kernel
+    if name == 'linear':
+        def linear_kernel(x: np.ndarray, y: np.ndarray):
+            return x@y.T
+        return linear_kernel
+    
+def check_pd(M: np.ndarray) -> bool:
+    try:
+        scipy.linalg.cholesky(M)
+    except np.linalg.LinAlgError:
+        return False
+    return True
+
+
+class KFDA(TransformerMixin, ClassifierMixin, BaseEstimator):
+    def __init__(self, kernel: Callable[[np.ndarray, np.ndarray], np.ndarray], nb_class: int, epsilon: float, nb_eigv: int):
         self.kernel = kernel
         self.count_class = None #number of data for each class
-        self.nb_class = nb_class
+        self.nb_class = None
         self.gram = None
+        self.nb_eigv = nb_eigv
         self.eigen_vec=None
+        self.epsilon = epsilon
 
-    def _count_class(self,data_y: np.array):
+    def _count_class(self, data_y: np.array):
         """
         Count the number of element in each class.
         """
-        self.count_class=np.zeros(self.nb_class, dtype=int)
-        for i in range(self.nb_class):
-            self.count_class[i]= np.count_nonzero(data_y==i)
+        y_unique = np.unique(data_y)
+        self.count_class = np.array([np.count_nonzero(data_y == elem) for elem in y_unique]).astype('int')
 
-    def _Gram(self,data_x_train: np.array, data_x: np.array):
+    def _Gram(self,X: np.array, data_x: np.array):
         """
-        Compute the gram matrix given the dataset data_x_train and data_x
+        Compute the gram matrix given the dataset X and data_x
         """
-        kern=self.kernel(data_x_train, data_x)
+        kern=self.kernel(X, data_x)
         return kern
 
-    def ordering(self, data_x_train: np.array, data_y_train: np.array):
-        """
-        Return a list containing the order of apparition of each element in data_x in their respective class.
-        The list has the following structure, for each class, we store the elements in this class and with the order in which it appears.
-        This list will be usefull to compute the matrix N.
-        """
-        order = np.zeros((self.nb_class, len(data_x_train)), dtype=int)
-        counter = np.zeros(self.nb_class)
-        for i in range(len(data_x_train)):
-            order[data_y_train[i]][i]=counter[data_y_train[i]]
-            counter[data_y_train[i]]+=1
-        del counter
-        return order
+    def M_matrix(self, X: np.array, y_one_hot: np.array):
 
-    def M_matrix(self,data_x_train: np.array, data_y_train: np.array):
         """
-        Compute M and N matrix. 
-        To compute Mi, it is enough to compute the product of the gram matrix with the indicator of class, and then to sum over the rows. 
-        Computing M from Mi and Mstar is straighforward after that.
-        To compute N, it is more intricate. One needs to compute beforehand a matrix 'order' which rank the element of data_x by their order of apparition
-        in their own class.
+        Compute M matrix. 
         """
-        #Number of element in data_x
-        n = data_x_train.shape[0]
+
         #Compute M_star
-        M_star = np.mean(self.gram, axis = -1) #must be of size len(data_x_train)
+        M_star = np.mean(self.gram, axis = -1) #must be of size len(X)
 
-        #Indicator matrix of class
-        Indicator = np.zeros((n, self.nb_class))
-        Indicator[np.arange(n), data_y_train]=1/self.count_class[data_y_train]
-        #Compute Mi matrix and concatenate them into matrix M_m
-        M_m = self.gram@Indicator
-        #Compute M matrix
-        M_matrix = np.zeros((n,n))
-        for i in range(self.nb_class):
-            M_matrix += np.outer(M_m[:,i] - M_star, M_m[:,i] - M_star)*self.count_class[i]
-        return M_matrix
+        m_class = y_one_hot.T@self.gram
+        
+        M = (m_class - M_star).T@(m_class - M_star)
+        return M
 
-    def N_matrix(self,data_x_train: np.array, data_y_train: np.array):
+    def N_matrix(self, X: np.array, y_one_hot: np.ndarray):
         #Number of element in data_x
-        n = data_x_train.shape[0]
-        N_matrix = np.zeros((n,n))
-        order = self.ordering(data_x_train, data_y_train) #order matrix of size nb_class x n
-    
+        n = X.shape[0]
+        N = np.zeros((n,n))
+
         for i in range(self.nb_class):
             l = self.count_class[i] #number of element in the class i
-            B = np.zeros((n,l))
-            Index=np.where(data_y_train==i)
-            B[Index, order[i][Index]]=1
-            Kj=self.gram@B
-            N_matrix += Kj@(np.eye(l) - np.ones((l,l))*1/l)@Kj.T
-        return N_matrix
+            Index = np.where(y_one_hot[:,i] == 1)[0]
+            Kj = self.gram[:,Index]
+            N += Kj@(np.eye(l) - np.ones((l,l))*1/l)@Kj.T
+        return N
 
-    def fit(self, data_x_train: np.array, data_y_train: np.array, nb_eig_v: int):
-        if (len(data_x_train) != len(data_y_train)):
+    def fit(self, X: np.ndarray, y: np.array):
+        if (len(X) != len(y)):
             raise ValueError("Error, label and data have not same length")
-        self.N = data_x_train.shape[0]
-        self.gram = self._Gram(data_x_train, data_x_train)
-        self._count_class(data_y_train)
-        M_matrix, N_matrix = self.M_matrix(data_x_train, data_y_train), self.N_matrix(data_x_train, data_y_train)
-        vecs = scipy.linalg.eig(M_matrix, N_matrix)
-        self.eigen_vec=vecs[1][:,:nb_eig_v]
+        
+        self.X_ = X
+        self.y_ = y
+        
+        self.gram = self._Gram(X, X)
+        self.nb_class = len(np.unique(y))
+        self._count_class(y)
+        
+        enc = OneHotEncoder()
+        y_one_hot = enc.fit_transform(y[:,None]).toarray() #One hot encoding 
 
-    def transform(self, data_x_tr: np.array, data_x_te: np.array):
+        M, N = self.M_matrix(X, y_one_hot), self.N_matrix(X, y_one_hot)
+        symetrize(N)
+        symetrize(M)
+        
+        N += np.eye(len(N))*self.epsilon #For better numerical stability 
+
+        _, vecs = eigh(M, N, subset_by_index=[len(N) - self.nb_eigv, len(N) - 1])
+        self.eigen_vec = vecs
+        
+        m_class = y_one_hot.T@self.gram
+        
+        self.centroids = m_class@vecs
+        
+        self.clf = NearestCentroid()
+        self.clf.fit(self.centroids, np.unique(y))
+        
+        return self #Return the classifier
+
+    def transform(self, X_test: np.array):
         """
         Compute the projection of data_x_te onto the eigenvectors of data_x_tr
         """
-        gram = self._Gram(data_x_tr,data_x_te)
-        return self.eigen_vec.T@gram, gram
-
+        check_is_fitted(self)
+        
+        gram = self._Gram(X_test, self.X_)
+        return gram@self.eigen_vec
+    
+    def predict(self, X_test: np.ndarray):
+        
+        check_is_fitted(self)
+        
+        X_transf = self.transform(self.X_, X_test)
+        
+        return self.clf.predict(X_transf)
+        
 if __name__=="__main__":
     logger=logging.getLogger(__name__)
     logging.basicConfig(filename = 'stdout.log', level=logging.INFO)
-    sigma=.01
+    sigma=1
     logger.info("Loading data...")
     logger.info(f"Selecting a RBF kernel with bandwidth {sigma}...")
-    k=kernel(sigma)
-    
-    data_x,data_y=generate_dataset([-5,10,1], [2,1,4])
-    data_x_train, data_y_train, data_x_test, data_y_test=split_dataset(data_x, data_y)
-    
-    Fisher=Fisher_discriminant(k, 3)
+    k=kernel('RBF')
+
+    data_x,data_y=generate_dataset([-20,10,1], [.1, 1,.1], size=300)
+    X, y, X_test, y_test=split_dataset(data_x, data_y)
+
+    Fisher=KFDA(k, 3, epsilon=1e-8, nb_eigv=3)
     logger.info("Fitting data...")
-    Fisher.fit(data_x_train, data_y_train, 3)
+    Fisher=Fisher.fit(X, y)
     logger.info("Prediction on test dataset...")
-    prediction, _=Fisher.transform(data_x_train, data_x_test)
-    print(prediction.T/np.linalg.norm(prediction))
+    prediction=Fisher.transform(X_test)
+    prediction=normalize(prediction)
+
+    color = ('r', 'g', 'b')
+    fig = plt.figure()
+    for point, label in zip(X_test, y_test):
+        plt.scatter(point[0], point[1], color=color[label], alpha = .5)
+        plt.title("Before data separation")
+
+    fig = plt.figure()
+    for point, label in zip(prediction, y_test):
+        plt.scatter(point[0], point[2], color=color[label], alpha = .5)
+        plt.title("After KFDA transform")
+    plt.legend()
