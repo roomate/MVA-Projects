@@ -3,7 +3,7 @@
 ###################################################
 #Hugo Negrel
 #April 2024
-#The mathematical details about KFDA can be be found at: 
+#The mathematical details about KFDA can be be found at: https://arxiv.org/abs/1906.09436 
 
 import numpy as np
 import scipy.linalg
