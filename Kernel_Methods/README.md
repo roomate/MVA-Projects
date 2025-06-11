@@ -39,7 +39,7 @@ As usual, there is a training phase followed by a testing phase.
 
 The test dataset is simply made by adding a uniform pixel-wise noise to some clean MNIST.
 
-Below is the result after training for different levels of noise.
+Below is the result after training for different levels of noise. First row is the corrupted data (the input), the second row is the output data of the autoencoder. One hopes to recover a denoised MNIST digits here.
 
 - 0%:
 <img src="img/noise_0.PNG" alt="drawing" width="400"/> 
