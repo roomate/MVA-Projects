@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.optimize as optimize
 
 # SVM class  for multi-class classification using the one-vs-all (OvA) strategy 
 class SVM:
