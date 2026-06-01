@@ -18,7 +18,7 @@ from collections.abc import Callable
 from sklearn.preprocessing import normalize
 import matplotlib.pyplot as plt
 
-def split_dataset(X: np.array, y: np.array, split: int=20)->(np.array, np.array, np.array, np.array):
+def split_dataset(X: np.array, y: np.array, split: int=20)->(np.ndarray, np.ndarray, np.ndarray, np.ndarray):
     X_test, X = np.split(X, [split], axis=0)
     y_test, y = np.split(y, [split], axis=0)
     return X, y.astype(int), X_test, y_test.astype(int)
@@ -55,13 +55,6 @@ def kernel(name: str, *args) -> Callable[[np.ndarray, np.ndarray], np.ndarray]:
         def linear_kernel(x: np.ndarray, y: np.ndarray):
             return x@y.T
         return linear_kernel
-    
-def check_pd(M: np.ndarray) -> bool:
-    try:
-        scipy.linalg.cholesky(M)
-    except np.linalg.LinAlgError:
-        return False
-    return True
 
 
 class KFDA(TransformerMixin, ClassifierMixin, BaseEstimator):
@@ -94,12 +87,14 @@ class KFDA(TransformerMixin, ClassifierMixin, BaseEstimator):
         Compute M matrix. 
         """
 
+        if self.gram is None:
+            self.gram=self._Gram(X, X)
         #Compute M_star
-        M_star = np.mean(self.gram, axis = -1) #must be of size len(X)
+        M_star = np.mean(self.gram, axis = -1) #Average over last axis.
 
         m_class = y_one_hot.T@self.gram
         
-        M = (m_class - M_star).T@(m_class - M_star)
+        M = ((m_class - M_star).T * self.count_class)@ (m_class - M_star)
         return M
 
     def N_matrix(self, X: np.array, y_one_hot: np.ndarray):
@@ -134,21 +129,21 @@ class KFDA(TransformerMixin, ClassifierMixin, BaseEstimator):
         
         N += np.eye(len(N))*self.epsilon #For better numerical stability 
 
-        _, vecs = eigh(M, N, subset_by_index=[len(N) - self.nb_eigv, len(N) - 1])
+        _, vecs = eigh(M, N, subset_by_index=[len(N) - self.nb_eigv, len(N) - 1]) #keep only eigenvectors associated with largest eigenvalues
         self.eigen_vec = vecs
-        
-        m_class = y_one_hot.T@self.gram
+
+        m_class = (y_one_hot/self.count_class).T@self.gram
         
         self.centroids = m_class@vecs
         
         self.clf = NearestCentroid()
         self.clf.fit(self.centroids, np.unique(y))
-        
+
         return self #Return the classifier
 
     def transform(self, X_test: np.array):
         """
-        Compute the projection of data_x_te onto the eigenvectors of data_x_tr
+        Compute the projection of X_test onto the eigenvectors of X_train. For dimension reduction.
         """
         check_is_fitted(self)
         
@@ -156,6 +151,9 @@ class KFDA(TransformerMixin, ClassifierMixin, BaseEstimator):
         return gram@self.eigen_vec
     
     def predict(self, X_test: np.ndarray):
+        """
+        Return the most likely class to which a data belongs.
+        """
         
         check_is_fitted(self)
         
